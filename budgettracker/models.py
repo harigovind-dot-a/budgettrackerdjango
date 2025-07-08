@@ -14,16 +14,11 @@ class Category(models.Model):
         return f"{self.name} ({self.type})"
     
 class Transaction(models.Model):
-    TYPE_CHOICES = (
-        ('income', 'Income'),
-        ('expense', 'Expense'),
-    )
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='transactions')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
-    type = models.CharField(max_length=7, choices=TYPE_CHOICES)
 
     def __str__(self):
         return f"{self.category.name} - {self.amount} on {self.date}"

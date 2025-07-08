@@ -10,8 +10,8 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('category', 'amount', 'date', 'user', 'type')
-    list_filter = ('category', 'date', 'user', 'type')
+    list_display = ('category', 'amount', 'date', 'user')
+    list_filter = ('category', 'date', 'user')
 
 @admin.register(Budget)
 class BudgetAdmin(admin.ModelAdmin):
