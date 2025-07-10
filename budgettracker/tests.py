@@ -9,8 +9,8 @@ class BudgetAPITestCase(APITestCase):
         self.user = User.objects.create_user(username='testuser', password='testpass123')
         self.client.login(username='testuser', password='testpass123')
         
-        self.income_category = Category.objects.create(name='Salary', type='income', user=self.user)
-        self.expense_category = Category.objects.create(name='Groceries', type='expense', user=self.user)
+        self.income_category = Category.objects.create(name='Salary', type=1, user=self.user)
+        self.expense_category = Category.objects.create(name='Groceries', type=2, user=self.user)
         
         today = date.today()
         Transaction.objects.create(amount=30000, date=today, category=self.income_category, user=self.user)
