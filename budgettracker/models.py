@@ -3,15 +3,15 @@ from django.contrib.auth.models import User
 
 class Category(models.Model):
     TYPE_CHOICES = (
-        ('income', 'Income'),
-        ('expense', 'Expense'),
+        (1, 'Income'),
+        (2, 'Expense'),
     )
     name = models.CharField(max_length=100)
-    type = models.CharField(max_length=7, choices=TYPE_CHOICES)
+    type = models.IntegerField(choices=TYPE_CHOICES)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='categories')
 
     def __str__(self):
-        return f"{self.name} ({self.type})"
+        return f"{self.name} ({self.get_type_display()})"
     
 class Transaction(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='transactions')

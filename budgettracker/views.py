@@ -1,6 +1,5 @@
 from rest_framework import viewsets, permissions
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Budget, Transaction, Category
@@ -18,7 +17,7 @@ class BudgetViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     @action(detail=False, methods=['get'])
-    def current_budget(self, request):
+    def current_budget(self):
         today = date.today()
         qs = self.get_queryset().filter(month=today.month, year=today.year)
         serializer = self.get_serializer(qs, many=True)
@@ -56,14 +55,14 @@ class BudgetStatusView(APIView):
 
         income_total = Transaction.objects.filter(
             user=user,
-            category__type='income',
+            category__type = 1 ,
             date__month=month,
             date__year=year
         ).aggregate(Sum('amount'))['amount__sum'] or 0.00
 
         expense_total = Transaction.objects.filter(
             user=user,
-            category__type='expense',
+            category__type= 2 ,
             date__month=month,
             date__year=year
         ).aggregate(Sum('amount'))['amount__sum'] or 0.00
