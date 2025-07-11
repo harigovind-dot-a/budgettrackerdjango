@@ -7,7 +7,7 @@ class Category(models.Model):
         (2, 'Expense'),
     )
     name = models.CharField(max_length=100)
-    type = models.IntegerField(choices=TYPE_CHOICES)
+    type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='categories')
 
     def __str__(self):
@@ -24,8 +24,8 @@ class Transaction(models.Model):
         return f"{self.category.name} - {self.amount} on {self.date}"
 
 class Budget(models.Model):
-    month = models.IntegerField()
-    year = models.IntegerField()
+    month = models.PositiveSmallIntegerField()
+    year = models.PositiveSmallIntegerField()
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budgets')
 

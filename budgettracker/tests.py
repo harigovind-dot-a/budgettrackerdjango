@@ -32,6 +32,15 @@ class BudgetAPITestCase(APITestCase):
         self.assertIn('remaining_budget', response.data)
         print("Budget Status Response:", response.data)
 
+    def test_budget_status_custom_month_year(self):
+        today = date.today()
+        response = self.client.get(
+            f'/api/budget-status/?month={today.month}&year={today.year}',
+            HTTP_AUTHORIZATION=self.auth_header
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['month and year'], f"{today.month}/{today.year}")
+
     def test_auth_required(self):
         response = self.client.get('/api/budget-status/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

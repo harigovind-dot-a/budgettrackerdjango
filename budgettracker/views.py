@@ -1,11 +1,12 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Budget, Transaction, Category
-from .serializers import BudgetSerializer, TransactionSerializer, CategorySerializer
+from .serializers import BudgetSerializer, TransactionSerializer, CategorySerializer, BudgetStatusParamSerializer
 from django.db.models import Sum
 from datetime import date
+from decimal import Decimal
 
 class BudgetViewSet(viewsets.ModelViewSet):
     serializer_class = BudgetSerializer
@@ -46,26 +47,28 @@ class BudgetStatusView(APIView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        today = date.today()
-        month = today.month
-        year = today.year
+
+        query_serialize = BudgetStatusParamSerializer(data=request.query_params)
+        query_serialize.is_valid(raise_exception=True)
+        month  = query_serialize.validated_data['month']
+        year = query_serialize.validated_data['year']
 
         budget = Budget.objects.filter(user=user, month=month, year=year).first()
-        budget_amount = budget.amount if budget else 0.00
+        budget_amount = budget.amount if budget else Decimal('0.00')
 
         income_total = Transaction.objects.filter(
             user=user,
             category__type = 1 ,
             date__month=month,
             date__year=year
-        ).aggregate(Sum('amount'))['amount__sum'] or 0.00
+        ).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
 
         expense_total = Transaction.objects.filter(
             user=user,
             category__type= 2 ,
             date__month=month,
             date__year=year
-        ).aggregate(Sum('amount'))['amount__sum'] or 0.00
+        ).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
 
         net_savings = income_total - expense_total
         remaining_budget = budget_amount - expense_total
