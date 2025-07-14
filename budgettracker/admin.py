@@ -1,12 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Category, Transaction, Budget
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'user')
-    list_filter = ('type', 'user')
+from .models import Transaction, Budget
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):

@@ -1,34 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
-class Category(models.Model):
-    TYPE_CHOICES = (
-        (1, 'Income'),
-        (2, 'Expense'),
-    )
-    name = models.CharField(max_length=100)
-    type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='categories')
+class CategoryType(models.IntegerChoices):
+    INCOME = 1, 'Income'
+    EXPENSE = 2, 'Expense'
 
-    def __str__(self):
-        return f"{self.name} ({self.get_type_display()})"
-    
 class Transaction(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='transactions')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.PositiveSmallIntegerField(choices=CategoryType.choices, default=CategoryType.EXPENSE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(1)])
     date = models.DateField()
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
 
     def __str__(self):
-        return f"{self.category.name} - {self.amount} on {self.date}"
+        return f"{self.category} - {self.amount} on {self.date}"
 
 class Budget(models.Model):
-    month = models.PositiveSmallIntegerField()
-    year = models.PositiveSmallIntegerField()
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    month = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
+    year = models.PositiveSmallIntegerField(validators=[MinValueValidator(1900), MaxValueValidator(2200)])
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(10)])
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budgets')
+
+    class Meta:
+        unique_together = ('user', 'month', 'year')
 
     def __str__(self):
         return f"{self.user.username}'s Budget for {self.month}/{self.year}"
-    

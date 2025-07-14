@@ -12,14 +12,14 @@
             "password": "testpass123"
         }
         Use the "access" token from response.
-    2. GET /api/budget-status/
+    2. GET /api/budgets/status/?month=7&year=2025
         Authorization: Bearer <your-access-token>
         You will get response as For eg:
             {
-                "month": "July",
-                "budget": 40000,
-                "income_total": 30000,
-                "expenses_total": 14000,
-                "net_savings": 16000,
-                "remaining_budget": 26000
+                "month and year": "7/2025",
+                "budget_amount": 1000.0,
+                "income_total": 900.0,
+                "expense_total": 500.0,
+                "net_savings": 400.0,
+                "remaining_budget": 500.0
             }
