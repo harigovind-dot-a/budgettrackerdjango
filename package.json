@@ -1,0 +1,24 @@
+{
+  "name": "djangobudgettracker",
+  "version": "1.0.0",
+  "description": "Budget Tracker API using Django REST Framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx @tailwindcss/cli -i ./budgettracker/static/src/input.css -o ./budgettracker/static/src/output.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harigovind-dot-a/budgettrackerdjango.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/harigovind-dot-a/budgettrackerdjango/issues"
+  },
+  "homepage": "https://github.com/harigovind-dot-a/budgettrackerdjango#readme",
+  "devDependencies": {
+    "tailwindcss": "^4.1.11"
+  }
+}

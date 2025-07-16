@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .models import Budget, Transaction, CategoryType
 from .serializers import BudgetSerializer, TransactionSerializer
 from django.db.models import Sum
+from django.views.generic import TemplateView
 
 class BudgetViewSet(viewsets.ModelViewSet):
     serializer_class = BudgetSerializer
@@ -58,3 +59,15 @@ class TransactionViewSet(viewsets.ModelViewSet):
         return Transaction.objects.filter(user=self.request.user)
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class RegisterView(TemplateView):
+    template_name = 'budgettracker/register.html'
+
+class LoginView(TemplateView):
+    template_name = 'budgettracker/login.html'
+
+class TransactionFormView(TemplateView):
+    template_name = 'budgettracker/transactionform.html'
+
+class BudgetFormView(TemplateView):
+    template_name = 'budgettracker/budgetform.html'

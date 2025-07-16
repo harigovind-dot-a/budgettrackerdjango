@@ -13,6 +13,7 @@ db.sqlite3
 env/
 venv/
 ENV/
+*.sqlite3
 
 # Ignore IDE/editor files
 .vscode/
@@ -25,3 +26,7 @@ ENV/
 # Ignore OS files
 .DS_Store
 Thumbs.db
+
+# Ignore Node
+node_modules/
+# package-lock.json # if needed

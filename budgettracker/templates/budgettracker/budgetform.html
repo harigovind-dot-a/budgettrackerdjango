@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="bg-yellow-50 text-gray-800">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{% static 'src/output.css' %}" />
+  <title>Add Budget</title>
+</head>
+<body class="flex justify-center items-center min-h-screen px-4 py-10">
+    <div class="w-full max-w-md p-6 bg-white border border-yellow-300 rounded-2xl shadow-lg">
+        <h2 class="text-2xl font-bold text-yellow-600 mb-6 text-center">Add Budget</h2>
+
+        <!-- Status Bar -->
+        <div id="statusBar" class="hidden mb-4 p-2 bg-red-100 text-red-700 rounded text-sm text-center">
+            Please fill in all required fields.
+        </div>
+
+        <form id="budgetForm" class="space-y-4" onsubmit="return validateBudgetForm(event)">
+            <!-- Month -->
+            <div>
+                <label for="month" class="block text-sm font-medium text-yellow-700 mb-1">Month</label>
+                <select id="month" name="month" required
+                        class="w-full border border-yellow-300 rounded-md p-2 bg-white focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer">
+                    <option value="" disabled selected>Select month</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+
+            <!-- Year -->
+            <div>
+                <label for="year" class="block text-sm font-medium text-yellow-700 mb-1">Year</label>
+                <input type="number" id="year" name="year" min="1900" max="2200" required
+                       class="w-full border border-yellow-300 rounded-md p-2 focus:ring-yellow-500 focus:border-yellow-500">
+            </div>
+
+            <!-- Amount -->
+            <div>
+                <label for="amount" class="block text-sm font-medium text-yellow-700 mb-1">Amount</label>
+                <input type="number" id="amount" name="amount" min="10" step="0.01" required
+                       class="w-full border border-yellow-300 rounded-md p-2 focus:ring-yellow-500 focus:border-yellow-500">
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex justify-end">
+                <button type="submit"
+                        class="bg-blue-400 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded shadow cursor-pointer">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function validateBudgetForm(e) {
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+            const amount = document.getElementById('amount').value;
+
+            if (!month || !year || !amount) {
+                document.getElementById('statusBar').classList.remove('hidden');
+                e.preventDefault();
+                return false;
+            }
+
+            document.getElementById('statusBar').classList.add('hidden');
+            return true;
+        }
+    </script>
+</body>
+</html>
