@@ -1,15 +1,16 @@
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Budget, Transaction, CategoryType
+from .models import Budget, Transaction, Category, TransactionType
 from .forms import RegisterForm
 from .serializers import BudgetSerializer, TransactionSerializer
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import LoginView
+from django.contrib.auth import login
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 class BudgetViewSet(viewsets.ModelViewSet):
     serializer_class = BudgetSerializer
@@ -30,14 +31,14 @@ class BudgetViewSet(viewsets.ModelViewSet):
 
         income_total = Transaction.objects.filter(
             user=user,
-            category=CategoryType.INCOME ,
+            type=TransactionType.INCOME,
             date__month=month,
             date__year=year
         ).aggregate(Sum('amount'))['amount__sum']
 
         expense_total = Transaction.objects.filter(
             user=user,
-            category=CategoryType.EXPENSE ,
+            type=TransactionType.EXPENSE,
             date__month=month,
             date__year=year
         ).aggregate(Sum('amount'))['amount__sum']
@@ -78,12 +79,39 @@ class Register(FormView):
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
     
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'budgettracker/dashboard.html'
 
 class Login(LoginView):
     template_name = 'budgettracker/login.html'
+    success_url = reverse_lazy('dashboard')
 
 class TransactionForm(TemplateView):
     template_name = 'budgettracker/transactionform.html'
 
 class BudgetForm(TemplateView):
     template_name = 'budgettracker/budgetform.html'
+
+class CategoryForm(TemplateView):
+    template_name = 'budgettracker/categoryform.html'
+
+class ListCategoryView(LoginRequiredMixin, TemplateView):
+    template_name = 'budgettracker/listcategory.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.filter(user=self.request.user)
+        return context
+
+class ListTransactionView(LoginRequiredMixin, TemplateView):
+    template_name = 'budgettracker/listtransaction.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['transactions'] = Transaction.objects.filter(user=self.request.user)
+        return context
+
+class ListBudgetView(LoginRequiredMixin, TemplateView):
+    template_name = 'budgettracker/listbudget.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['budgets'] = Budget.objects.filter(user=self.request.user)
+        return context

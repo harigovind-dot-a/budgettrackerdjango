@@ -1,0 +1,12 @@
+{% extends 'budgettracker/dashboardbase.html' %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Your Categories</h1>
+<ul class="space-y-2">
+  {% for category in categories %}
+    <li class="p-2 bg-white shadow rounded">{{ category.name }}</li>
+  {% empty %}
+    <li>No categories found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'budgettracker/dashboardbase.html' %}
+{% block title %}Budgets{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Your Budgets</h1>
+<ul class="space-y-2">
+  {% for budget in budgets %}
+    <li class="p-2 bg-white shadow rounded">
+      {{ budget.month }}/{{ budget.year }}: ₹{{ budget.amount }}
+    </li>
+  {% empty %}
+    <li>No budgets found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

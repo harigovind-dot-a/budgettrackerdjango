@@ -17,10 +17,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from budgettracker.views import Login, DashboardView, Register, ListBudgetView, ListCategoryView, ListTransactionView
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('', Login.as_view(), name='login'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('register/', Register.as_view(), name='register'),
+
+    path('budgets/', ListBudgetView.as_view(), name='list-budget'),
+    path('transactions/', ListTransactionView.as_view(), name='list-transaction'),
+    path('categories/', ListCategoryView.as_view(), name='list-category'),
+
     path('api/', include('budgettracker.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
 ]

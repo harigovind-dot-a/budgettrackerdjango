@@ -1,0 +1,14 @@
+{% extends 'budgettracker/dashboardbase.html' %}
+{% block title %}Transactions{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Your Transactions</h1>
+<ul class="space-y-2">
+  {% for txn in transactions %}
+    <li class="p-2 bg-white shadow rounded">
+      {{ txn.date }} - {{ txn.get_type_display }} - {{ txn.amount }} ({{ txn.category.name }})
+    </li>
+  {% empty %}
+    <li>No transactions found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
