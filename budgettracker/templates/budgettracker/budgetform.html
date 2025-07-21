@@ -22,10 +22,11 @@
       </div>
 
       <form
+        method="POST"
         id="budgetForm"
         class="space-y-4"
-        onsubmit="return validateBudgetForm(event)"
       >
+      {% csrf_token %}
         <!-- Month -->
         <div>
           <label
@@ -40,18 +41,9 @@
             class="w-full border border-yellow-300 rounded-md p-2 bg-white focus:ring-yellow-500 focus:border-yellow-500 cursor-pointer"
           >
             <option value="" disabled selected>Select month</option>
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
+            {% for num, name in months %}
+              <option value="{{ num }}"> {{ name }} </option>
+            {% endfor %}
           </select>
         </div>
 
@@ -102,22 +94,5 @@
         </div>
       </form>
     </div>
-
-    <script>
-      function validateBudgetForm(e) {
-        const month = document.getElementById("month").value;
-        const year = document.getElementById("year").value;
-        const amount = document.getElementById("amount").value;
-
-        if (!month || !year || !amount) {
-          document.getElementById("statusBar").classList.remove("hidden");
-          e.preventDefault();
-          return false;
-        }
-
-        document.getElementById("statusBar").classList.add("hidden");
-        return true;
-      }
-    </script>
   </body>
 </html>

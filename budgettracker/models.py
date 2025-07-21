@@ -25,12 +25,6 @@ class Transaction(models.Model):
     def __str__(self):
         return f"{self.category} - {self.amount} on {self.date}"
     
-    def clean(self):
-        if self.category.user != self.user:
-            raise ValidationError("Category does not belong to this user.")
-        else:
-            pass
-
 class Budget(models.Model):
     month = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     year = models.PositiveSmallIntegerField(validators=[MinValueValidator(1900), MaxValueValidator(2200)])

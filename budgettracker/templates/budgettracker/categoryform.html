@@ -16,10 +16,11 @@
       </h2>
 
       <form
+        method="POST"
         id="categoryForm"
         class="space-y-4"
-        onsubmit="return validateCategoryForm(event)"
       >
+      {% csrf_token %}
         <!-- Category Input -->
         <div>
           <label
@@ -30,7 +31,7 @@
           <input
             type="text"
             id="category"
-            name="category"
+            name="name"
             placeholder="Type Category"
             required
             class="w-full border border-yellow-300 rounded-md p-2 focus:ring-yellow-500 focus:border-yellow-500"
@@ -48,19 +49,5 @@
         </div>
       </form>
     </div>
-
-    <script>
-      function validateCategoryForm(e) {
-        const category = document.getElementById("category").value;
-
-        if (!category.trim()) {
-          alert("Please enter a category.");
-          e.preventDefault();
-          return false;
-        }
-
-        return true;
-      }
-    </script>
   </body>
 </html>

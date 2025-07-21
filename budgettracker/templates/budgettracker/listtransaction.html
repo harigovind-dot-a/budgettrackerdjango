@@ -4,11 +4,27 @@
 <h1 class="text-2xl font-bold mb-4">Your Transactions</h1>
 <ul class="space-y-2">
   {% for txn in transactions %}
-    <li class="p-2 bg-white shadow rounded">
-      {{ txn.date }} - {{ txn.get_type_display }} - {{ txn.amount }} ({{ txn.category.name }})
+    <li class="p-2 bg-white shadow rounded flex justify-between items-center">
+      <span>
+        {{ txn.date }} - {{ txn.get_type_display }} - {{ txn.amount }} ({{ txn.category.name }})
+      </span>
+      <div class="space-x-2">
+        <a href="{% url 'edit-transaction' txn.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
+        <form method="post" action="{% url 'delete-transaction' txn.id %}" onsubmit="return confirm('Do you really want to delete this transaction?');">
+          {% csrf_token %}
+          <button class="text-red-600 hover:text-red-800 font-semibold cursor-pointer" type="submit">Delete</button>
+        </form>
+      </div>
     </li>
   {% empty %}
     <li>No transactions found.</li>
   {% endfor %}
 </ul>
+{% endblock %}
+
+{% block add_button %}
+  <a href="{% url 'transactionform' %}"
+     class="fixed bottom-6 right-6 bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-full shadow-lg font-semibold text-sm cursor-pointer z-50">
+    + Add Transaction
+  </a>
 {% endblock %}

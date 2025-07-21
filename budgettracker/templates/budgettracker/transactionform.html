@@ -24,10 +24,11 @@
       </div>
 
       <form
+        method = "POST"
         id="transactionForm"
         class="space-y-4"
-        onsubmit="return validateForm(event)"
       >
+      {% csrf_token %}
         <!-- Date -->
         <div>
           <label
@@ -126,22 +127,5 @@
         </div>
       </form>
     </div>
-
-    <script>
-      function validateForm(e) {
-        const date = document.getElementById("date").value;
-        const type = document.getElementById("type").value;
-        const amount = document.getElementById("amount").value;
-
-        if (!date || !type || !amount) {
-          document.getElementById("statusBar").classList.remove("hidden");
-          e.preventDefault();
-          return false;
-        }
-
-        document.getElementById("statusBar").classList.add("hidden");
-        return true;
-      }
-    </script>
   </body>
 </html>

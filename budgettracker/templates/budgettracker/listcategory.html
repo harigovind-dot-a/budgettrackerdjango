@@ -4,9 +4,27 @@
 <h1 class="text-2xl font-bold mb-4">Your Categories</h1>
 <ul class="space-y-2">
   {% for category in categories %}
-    <li class="p-2 bg-white shadow rounded">{{ category.name }}</li>
+    <li class="p-2 bg-white shadow rounded flex justify-between items-center">
+      <span>
+        {{ category.name }}
+      </span>
+      <div class="space-x-2">
+        <a href="{% url 'edit-category' category.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
+        <form method="post" action="{% url 'delete-category' category.id %}" onsubmit="return confirm('Do you really want to delete this category?');">
+          {% csrf_token %}
+          <button class="text-red-600 hover:text-red-800 font-semibold cursor-pointer" type="submit">Delete</button>
+        </form>
+      </div>
+    </li>
   {% empty %}
     <li>No categories found.</li>
   {% endfor %}
 </ul>
+{% endblock %}
+
+{% block add_button %}
+  <a href="{% url 'categoryform' %}"
+     class="fixed bottom-6 right-6 bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-full shadow-lg font-semibold text-sm cursor-pointer z-50">
+    + Add Category
+  </a>
 {% endblock %}
