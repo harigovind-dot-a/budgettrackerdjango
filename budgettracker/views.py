@@ -1,16 +1,19 @@
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.test import APIRequestFactory
 from .models import Budget, Transaction, Category, TransactionType
-from .forms import RegisterForm, CategoryModelForm, TransactionModelForm, BudgetModelForm
+from .forms import RegisterForm, CategoryModelForm, TransactionModelForm, BudgetModelForm, BudgetSummaryForm
 from .serializers import BudgetSerializer, TransactionSerializer
 from django.urls import reverse_lazy
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView, DeleteView, UpdateView
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from decimal import Decimal
 import calendar
 
 class BudgetViewSet(viewsets.ModelViewSet):
@@ -29,21 +32,24 @@ class BudgetViewSet(viewsets.ModelViewSet):
         query = getattr(request, "query_params", request.GET)
         month  = int(query.get('month'))
         year = int(query.get('year'))
-        budget = (Budget.objects.get(user=user, month=month, year=year)).amount
-
+        budget_obj = (Budget.objects.get(user=user, month=month, year=year))
+        if not budget_obj:
+            raise ObjectDoesNotExist("No Budget set for this month")
+        else:
+            budget = budget_obj.amount
         income_total = Transaction.objects.filter(
             user=user,
             type=TransactionType.INCOME,
             date__month=month,
             date__year=year
-        ).aggregate(Sum('amount'))['amount__sum']
+        ).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
 
         expense_total = Transaction.objects.filter(
             user=user,
             type=TransactionType.EXPENSE,
             date__month=month,
             date__year=year
-        ).aggregate(Sum('amount'))['amount__sum']
+        ).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
 
         net_savings = income_total - expense_total
         remaining_budget = budget - expense_total
@@ -104,6 +110,9 @@ class TransactionForm(LoginRequiredMixin, FormView):
         transaction.save()
         return super().form_valid(form)
     
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+    
 class BudgetForm(LoginRequiredMixin, FormView):
     template_name = 'budgettracker/budgetform.html'
     form_class = BudgetModelForm
@@ -119,6 +128,9 @@ class BudgetForm(LoginRequiredMixin, FormView):
         budget.user = self.request.user
         budget.save()
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form)) 
 
 class CategoryForm(LoginRequiredMixin, FormView):
     template_name = 'budgettracker/categoryform.html'
@@ -130,6 +142,9 @@ class CategoryForm(LoginRequiredMixin, FormView):
         category.user = self.request.user
         category.save()
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))   
 
 class ListCategoryView(LoginRequiredMixin, TemplateView):
     template_name = 'budgettracker/listcategory.html'
@@ -212,16 +227,24 @@ class BudgetDeleteView(LoginRequiredMixin, DeleteView):
     def get_queryset(self):
         return Budget.objects.filter(user=self.request.user)
 
-class BudgetSummaryView(LoginRequiredMixin, TemplateView):
+class BudgetSummaryView(LoginRequiredMixin, FormView):
     template_name = 'budgettracker/summary.html'
+    form_class = BudgetSummaryForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        month = self.request.GET.get('month')
-        year = self.request.GET.get('year')
+    def form_valid(self, form):
+        month = form.cleaned_data['month']
+        year = form.cleaned_data['year']
+        context = self.get_context_data(form=form)
 
-        if month and year:
-            BudgetViewSet().request = self.request
-            response = BudgetViewSet().budget_status(self.request)
+        req = APIRequestFactory().get('/api/budgets/status/', {'month': month, 'year': year})
+        req.user = self.request.user
+        try:
+            BudgetViewSet().request = req
+            response = BudgetViewSet().budget_status(req)
             context['summary'] = response.data
-        return context
+        except ObjectDoesNotExist as e:
+            context['error'] = "No budget set for this month/year"
+        return self.render_to_response(context)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))

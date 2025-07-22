@@ -1,27 +1,40 @@
 {% extends 'budgettracker/dashboardbase.html' %}
 {% load custom_filters %}
+{% load widget_tweaks %}
 {% block title %}Summary{% endblock %}
 
 {% block content %}
 <h1 class="text-2xl font-bold mb-4">Monthly Budget Summary</h1>
 
-<form method="GET" class="mb-6 space-y-4 bg-white p-4 rounded shadow max-w-md">
+<form method="POST" class="mb-6 space-y-4 bg-white p-4 rounded shadow max-w-md">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="text-red-600 text-sm mb-2">
+            {{ form.non_field_errors.0 }}
+        </div>
+    {% endif %}
     <div>
-        <label for="month" class="block text-sm font-medium text-gray-700">Select Month</label>
-        <select name="month" id="month" class="w-full mt-1 border-gray-700 rounded-md shadow-sm">
-            {% for i in 1|to:12 %}
-                <option value="{{ i }}" {% if request.GET.month == i|stringformat:"s" %}selected{% endif %}>
-                    {{ i|get_month_name }}
-                </option>
-            {% endfor %}
-        </select>
+        <label for="{{ form.month.id_for_label }}" class="block text-sm font-medium text-gray-700">Select Month</label>
+        {{ form.month|add_class:"w-full p-3 text-base border border-gray-300 rounded-md" }}
+        {% if form.month.errors %}
+            <p class="text-red-600 text-sm mt-1">{{ form.month.errors.0 }}</p>
+        {% endif %}
     </div>
     <div>
-        <label for="year" class="block text-sm font-medium text-gray-700">Enter Year</label>
-        <input type="number" placeholder="yyyy" name="year" id="year" value="{{ request.GET.year }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm">
+        <label for="{{ form.year.id_for_label }}" class="block text-sm font-medium text-gray-700">Enter Year</label>
+        {{ form.year|add_class:"w-full p-3 text-base border border-gray-300 rounded-md" }}
+        {% if form.year.errors %}
+            <p class="text-red-600 text-sm mt-1">{{ form.year.errors.0 }}</p>
+        {% endif %}
     </div>
     <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 cursor-pointer">View Status</button>
 </form>
+{% if error %}
+  <div class="mb-4 p-3 text-red-600 bg-red-100 border border-red-400 rounded">
+    {{ error }}
+  </div>
+{% endif %}
 
 {% if summary %}
 <div class="bg-white rounded shadow p-6">
