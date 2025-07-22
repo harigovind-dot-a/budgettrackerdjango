@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from budgettracker.views import Login, DashboardView, Register, ListBudgetView, ListCategoryView, ListTransactionView, TransactionForm, BudgetForm, CategoryForm, TransactionDeleteView, BudgetDeleteView, CategoryDeleteView, TransactionUpdateView, BudgetUpdateView, CategoryUpdateView
+from budgettracker.views import Login, DashboardView, Register, ListBudgetView, ListCategoryView, ListTransactionView, TransactionForm, BudgetForm, CategoryForm, TransactionDeleteView, BudgetDeleteView, CategoryDeleteView, TransactionUpdateView, BudgetUpdateView, CategoryUpdateView, BudgetSummaryView
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
@@ -31,6 +31,7 @@ urlpatterns = [
     path('budgets/', ListBudgetView.as_view(), name='list-budget'),
     path('transactions/', ListTransactionView.as_view(), name='list-transaction'),
     path('categories/', ListCategoryView.as_view(), name='list-category'),
+    path('summary/', BudgetSummaryView.as_view(), name='budget-summary'),
 
     path('transactionform/', TransactionForm.as_view(), name='transactionform'),
     path('budgetform/', BudgetForm.as_view(), name='budgetform'),

@@ -26,8 +26,9 @@ class BudgetViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='status')
     def budget_status(self, request):
         user = request.user
-        month  = int(request.query_params['month'])
-        year = int(request.query_params['year'])
+        query = getattr(request, "query_params", request.GET)
+        month  = int(query.get('month'))
+        year = int(query.get('year'))
         budget = (Budget.objects.get(user=user, month=month, year=year)).amount
 
         income_total = Transaction.objects.filter(
@@ -210,3 +211,17 @@ class BudgetDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Budget.objects.filter(user=self.request.user)
+
+class BudgetSummaryView(LoginRequiredMixin, TemplateView):
+    template_name = 'budgettracker/summary.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        month = self.request.GET.get('month')
+        year = self.request.GET.get('year')
+
+        if month and year:
+            BudgetViewSet().request = self.request
+            response = BudgetViewSet().budget_status(self.request)
+            context['summary'] = response.data
+        return context
