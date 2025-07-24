@@ -9,13 +9,44 @@
       </span>
         {{ budget.month|get_month_name }}, {{ budget.year }}:  {{ budget.amount }}
       </span>
-      <div class="space-x-2">
-        <a href="{% url 'edit-budget' budget.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">Edit</a>
-        <form method="post" action="{% url 'delete-budget' budget.id %}" onsubmit="return confirm('Do you really want to delete this Budget?');">
+
+      <div class="relative inline-block text-left">
+        <button type="button"
+          class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+          onclick="toggleMenu(this)">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 6a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM10 11.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM10 17a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
+        </svg>
+        </button>
+        <div class="hidden absolute right-0 mt-2 w-28 bg-white border rounded shadow-lg z-50">
+          <a href="{% url 'edit-budget' budget.id %}" class="block px-4 py-2 text-sm text-blue-600 hover:bg-gray-100">Edit</a>
+          <form method="post" action="{% url 'delete-budget' budget.id %}"
+          onsubmit="return confirm('Do you really want to delete this Budget?');">
           {% csrf_token %}
-          <button class="text-red-600 hover:text-red-800 font-semibold cursor-pointer" type="submit">Delete</button>
-        </form>
+          <button class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer" type="submit">Delete</button>
+          </form>
+        </div>
       </div>
+
+      <script>
+        function toggleMenu(button) {
+          const menu = button.nextElementSibling;
+          document.querySelectorAll('[data-menu-open]').forEach(el => {
+              if (el !== menu) el.classList.add('hidden');
+          });
+          menu.classList.toggle('hidden');
+          menu.setAttribute('data-menu-open', !menu.classList.contains('hidden'));
+        }
+        document.addEventListener('click', function (e) {
+          const menus = document.querySelectorAll('[data-menu-open]');
+          menus.forEach(menu => {
+            if (!menu.previousElementSibling.contains(e.target) && !menu.contains(e.target)) {
+              menu.classList.add('hidden');
+            }
+          });
+        });
+      </script>
+
     </li>
   {% empty %}
     <li>No budgets found.</li>
@@ -25,7 +56,7 @@
 
 {% block add_button %}
   <a href="{% url 'budgetform' %}"
-     class="fixed bottom-6 right-6 bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-full shadow-lg font-semibold text-sm cursor-pointer z-50">
+     class="absolute bottom-6 right-6 bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-full shadow-lg font-semibold text-sm cursor-pointer">
     + Add Budget
   </a>
 {% endblock %}
