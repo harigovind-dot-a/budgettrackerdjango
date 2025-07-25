@@ -55,7 +55,10 @@
           {{ form.description|add_class:"w-full border border-yellow-300 rounded-md p-3 focus:ring-yellow-500 focus:border-yellow-500" }}
         </div>
 
-        <div class="flex justify-end">
+        <div class="flex justify-between">
+          <a href="{% url 'list-transaction' %}" class="bg-blue-400 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded shadow cursor-pointer">
+            Back
+          </a>
           <button type="submit" class="bg-blue-400 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded shadow cursor-pointer">
             Save
           </button>

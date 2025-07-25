@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.test import APIRequestFactory
 from .models import Budget, Transaction, Category, TransactionType
-from .forms import RegisterForm, CategoryModelForm, TransactionModelForm, BudgetModelForm, BudgetSummaryForm
+from .forms import RegisterForm, CategoryModelForm, TransactionModelForm, BudgetModelForm, BudgetSummaryForm, AnalyticsForm
 from .serializers import BudgetSerializer, TransactionSerializer
 from django.urls import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
@@ -150,7 +150,7 @@ class ListCategoryView(LoginRequiredMixin, TemplateView):
     template_name = 'budgettracker/listcategory.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.filter(user=self.request.user)
+        context['categories'] = Category.objects.filter(user=self.request.user).order_by('name')
         return context
     
 class CategoryUpdateView(LoginRequiredMixin, UpdateView):
@@ -177,7 +177,7 @@ class ListTransactionView(LoginRequiredMixin, TemplateView):
     template_name = 'budgettracker/listtransaction.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['transactions'] = Transaction.objects.filter(user=self.request.user)
+        context['transactions'] = Transaction.objects.filter(user=self.request.user).order_by('-date')
         return context
     
 class TransactionUpdateView(LoginRequiredMixin, UpdateView):
@@ -204,7 +204,7 @@ class ListBudgetView(LoginRequiredMixin, TemplateView):
     template_name = 'budgettracker/listbudget.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['budgets'] = Budget.objects.filter(user=self.request.user)
+        context['budgets'] = Budget.objects.filter(user=self.request.user).order_by('-year', '-month')
         return context
     
 class BudgetUpdateView(LoginRequiredMixin, UpdateView):
@@ -248,3 +248,29 @@ class BudgetSummaryView(LoginRequiredMixin, FormView):
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
+
+class AnalyticsView(LoginRequiredMixin, FormView):
+    template_name = 'budgettracker/chart.html'
+    form_class = AnalyticsForm
+
+    def form_valid(self, form):
+        month = form.cleaned_data['month']
+        year = form.cleaned_data['year']
+        tnx_type = form.cleaned_data['type']
+
+        transactions = Transaction.objects.filter(
+            user=self.request.user,
+            type=tnx_type,
+            date__month=month,
+            date__year=year
+        ).values('category__name').annotate(total=Sum('amount')).order_by('-total')
+
+        labels = [t['category__name'] for t in transactions]
+        data = [float(t['total']) for t in transactions]
+
+        context = self.get_context_data(form=form)
+        if not labels:
+            context['error'] = "No transactions found for the selected month/type."
+        else:
+            context.update({'labels' : labels, 'data' : data, 'type' : tnx_type})
+        return self.render_to_response(context)

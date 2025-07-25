@@ -12,7 +12,7 @@
 
       <div class="relative inline-block text-left">
         <button type="button"
-          class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+          class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
           onclick="toggleMenu(this)">
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 6a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM10 11.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM10 17a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/>
@@ -56,7 +56,7 @@
 
 {% block add_button %}
   <a href="{% url 'budgetform' %}"
-     class="absolute bottom-6 right-6 bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-full shadow-lg font-semibold text-sm cursor-pointer">
+     class="absolute top-22 right-6 bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-full shadow-lg font-semibold text-sm cursor-pointer">
     + Add Budget
   </a>
 {% endblock %}

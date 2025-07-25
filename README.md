@@ -23,3 +23,5 @@
                 "net_savings": 400.0,
                 "remaining_budget": 500.0
             }
+
+    3. For front-end used Tailwindcss CLI(4.1.11) for design and chart.js(4.5.0) for Visualization. Used Node Package Manager for static file controls.

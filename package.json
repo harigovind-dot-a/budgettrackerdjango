@@ -4,8 +4,10 @@
   "description": "Budget Tracker API using Django REST Framework",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx @tailwindcss/cli -i ./budgettracker/static/src/input.css -o ./budgettracker/static/src/output.css --watch"
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "dev": "run-p dev:css dev:js",
+  "dev:css": "npx @tailwindcss/cli -i ./budgettracker/static/src/input.css -o ./budgettracker/static/src/output.css --watch",
+  "dev:js": "esbuild ./budgettracker/static/src/chartinput.js --bundle --outfile=./budgettracker/static/dist/chart.js --watch"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,9 @@
   },
   "homepage": "https://github.com/harigovind-dot-a/budgettrackerdjango#readme",
   "devDependencies": {
+    "chart.js": "^4.5.0",
+    "esbuild": "^0.25.8",
+    "npm-run-all": "^4.1.5",
     "tailwindcss": "^4.1.11"
   }
 }
