@@ -1,3 +1,5 @@
+####################### Used for Django Template, not required for Angular #######################
+"""
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from .views import Login, Register, DashboardView, ListBudgetView, ListTransactionView, ListCategoryView, TransactionForm, BudgetForm, CategoryForm, TransactionDeleteView, BudgetDeleteView, CategoryDeleteView, TransactionUpdateView, BudgetUpdateView, CategoryUpdateView, BudgetSummaryView, AnalyticsView
@@ -28,3 +30,4 @@ urlpatterns = [
     path('category/edit/<int:pk>/', CategoryUpdateView.as_view(), name='edit-category'),
 
 ]
+"""
