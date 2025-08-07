@@ -1,57 +1,52 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.test import APIRequestFactory
+# from rest_framework.test import APIRequestFactory
 from .models import Budget, Transaction, Category, TransactionType
-from .forms import RegisterForm, CategoryModelForm, TransactionModelForm, BudgetModelForm, BudgetSummaryForm, AnalyticsForm
-from .serializers import BudgetSerializer, TransactionSerializer, CategorySerializer
-from django.urls import reverse_lazy
+# from .forms import RegisterForm, CategoryModelForm, TransactionModelForm, BudgetModelForm, BudgetSummaryForm, AnalyticsForm
+from .serializers import BudgetSerializer, TransactionSerializer, CategorySerializer, RegisterSerializer
+# from django.urls import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
-from django.views.generic import TemplateView
-from django.views.generic.edit import FormView, DeleteView, UpdateView
-from django.contrib.auth import login
-from django.contrib.auth.views import LoginView
-from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.views.generic import TemplateView
+# from django.views.generic.edit import FormView, DeleteView, UpdateView
+# from django.contrib.auth import login
+from django.contrib.auth.models import User
+# from django.contrib.auth.views import LoginView
+# from django.contrib.auth.mixins import LoginRequiredMixin
 from decimal import Decimal
-import calendar
-from django.contrib.auth import get_user_model # Just used to fix User null error
+# import calendar
 
 class BudgetViewSet(viewsets.ModelViewSet):
     serializer_class = BudgetSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [] # For angular to post Budget
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # return Budget.objects.filter(user=self.request.user)
-        return Budget.objects.all()
+        return Budget.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
-        # serializer.save(user=self.request.user)
-        default_user = get_user_model().objects.first() # Just used to fix User null error
-        serializer.save(user=default_user)
+        serializer.save(user=self.request.user)
 
     @action(detail=False, methods=['get'], url_path='status')
     def budget_status(self, request):
-        # user = request.user
+        user = request.user
         query = getattr(request, "query_params", request.GET)
         month  = int(query.get('month'))
         year = int(query.get('year'))
-        # budget_obj = (Budget.objects.get(user=user, month=month, year=year))
-        budget_obj = Budget.objects.filter(month=month, year=year).first()
+        budget_obj = Budget.objects.filter(user=user, month=month, year=year).first()
         if not budget_obj:
             raise ObjectDoesNotExist("No Budget set for this month")
         else:
             budget = budget_obj.amount
         income_total = Transaction.objects.filter(
-            # user=user,
+            user=user,
             type=TransactionType.INCOME,
             date__month=month,
             date__year=year
         ).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
 
         expense_total = Transaction.objects.filter(
-            # user=user,
+            user=user,
             type=TransactionType.EXPENSE,
             date__month=month,
             date__year=year
@@ -73,12 +68,14 @@ class BudgetViewSet(viewsets.ModelViewSet):
     # Additional Analytics Function for Angular to Fetch
     @action(detail=False, methods=['get'], url_path='analytics')
     def get_analytics(self, request):
+        user = request.user
         query = request.query_params
         month = int(query.get('month'))
         year = int(query.get('year'))
         tnx_type = int(query.get('type'))
 
         transactions = Transaction.objects.filter(
+            user=user,
             type=tnx_type,
             date__month=month,
             date__year=year
@@ -91,28 +88,29 @@ class BudgetViewSet(viewsets.ModelViewSet):
 
 class TransactionViewSet(viewsets.ModelViewSet):
     serializer_class = TransactionSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [] # For Angular to post Transaction
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # return Transaction.objects.filter(user=self.request.user)
-        return Transaction.objects.all()
+        return Transaction.objects.filter(user=self.request.user)
     def perform_create(self, serializer):
-        # serializer.save(user=self.request.user)
-        default_user = get_user_model().objects.first() # Just used to fix User null error
-        serializer.save(user=default_user)
+        serializer.save(user=self.request.user)
 
 # Added CategoryViewSet for Angular
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
-    permission_classes = []
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Category.objects.all()
+        return Category.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        default_user = get_user_model().objects.first() # Just used to fix User null error
-        serializer.save(user=default_user)
+        serializer.save(user=self.request.user)
+
+# Added RegisterView to validate user form in Angular
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = [permissions.AllowAny]
 
 ################## Below All Used for Templates in Django not Angular #########################
 """
