@@ -56,6 +56,7 @@ class BudgetViewSet(viewsets.ModelViewSet):
         remaining_budget = budget - expense_total
 
         data = {
+            'username' : user.username, #Added to show username in Angular Dashboard
             'month and year': f"{month}/{year}",
             'budget_amount': budget,
             'income_total': income_total,
